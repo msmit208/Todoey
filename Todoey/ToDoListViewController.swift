@@ -9,14 +9,14 @@
 import UIKit
 
 class ToDoListViewController: UITableViewController {
-    
-    let itemArray = ["Find Mike", "Buy Eggos", "Destroy Demogorgon"]
+
+    var itemArray = ["Find Mike", "Buy Eggos", "Destroy Demogorgon"]
 
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
     }
-    //Mark: TableView Datasource Methods
+    //MARK: - TableView Datasource Methods
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return itemArray.count
@@ -29,7 +29,7 @@ class ToDoListViewController: UITableViewController {
         
         return cell
     }
-    //Mark: TableVew Delegate Methods
+    //MARK: - TableVew Delegate Methods
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         //print(itemArray[indexPath.row]) //this will print out the corresponding item in the index row.
@@ -43,6 +43,34 @@ class ToDoListViewController: UITableViewController {
         
         tableView.deselectRow(at: indexPath, animated: true) //shows you selected a row and then deselects itself.
     }
+    
+    //MARK: - ADD NEW ITEMS
+    
+    @IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
+        
+        var textField = UITextField()
+        
+        
+        let alert = UIAlertController(title: "Add New Todoey Item", message: "", preferredStyle: .alert)
+        
+        let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
+            //what will happen once the user clicks the add item button on our UIAlert.
+            
+            self.itemArray.append(textField.text!) //you can force unwrap because the text property of a textfield will never equal nil
+            self.tableView.reloadData() //updates and adds new data to array.
+            
+        }//this is the button you press after you have finished creating your todo list item.
+        
+        alert.addTextField { (alertTextField) in
+            alertTextField.placeholder = "Create new item"
+            textField = alertTextField
+        }
+        alert.addAction(action)
+        
+        present(alert, animated: true, completion: nil)
+    }
+    
+    
     
 }
 
