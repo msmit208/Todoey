@@ -11,9 +11,18 @@ import UIKit
 class ToDoListViewController: UITableViewController {
 
     var itemArray = ["Find Mike", "Buy Eggos", "Destroy Demogorgon"]
+    
+    let defaults = UserDefaults.standard //in order to use user defaults a new object had to be made.
 
+    //MARK: - User defaults in ViewDidLoad
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        if let items = defaults.array(forKey: "TodoListArray") as? [String] {
+            itemArray = items
+        } // in order to retrieve data from userdefauls upon relaunching off app so no data is terminated.
+        
         // Do any additional setup after loading the view, typically from a nib.
     }
     //MARK: - TableView Datasource Methods
@@ -57,6 +66,9 @@ class ToDoListViewController: UITableViewController {
             //what will happen once the user clicks the add item button on our UIAlert.
             
             self.itemArray.append(textField.text!) //you can force unwrap because the text property of a textfield will never equal nil
+            
+            self.defaults.set(self.itemArray, forKey: "TodoListArray") // this saves the updated itemArray to the user defaults using the key "TodoListArray" making it a dictionary. remember this code is inside a closure hence the need for the self. at the beginning of the code.
+            
             self.tableView.reloadData() //updates and adds new data to array.
             
         }//this is the button you press after you have finished creating your todo list item.
