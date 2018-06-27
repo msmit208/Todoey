@@ -11,32 +11,16 @@ import UIKit
 class ToDoListViewController: UITableViewController {
 
     var itemArray = [Item] ()
+     let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Itens.plist")
     
-    let defaults = UserDefaults.standard //in order to use user defaults a new object had to be made.
 
     //MARK: - User defaults in ViewDidLoad
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let newItem = Item()
-        newItem.title = "find Mike"
-        itemArray.append(newItem)
-        
-        let newItem2 = Item()
-        newItem.title = "Buy Eggos"
-        itemArray.append(newItem2)
-        
-        let newItem3 = Item()
-        newItem.title = "Destroy Demogorgon"
-        itemArray.append(newItem3)
-        
+        loadItems()
 
-        if let items = defaults.array(forKey: "TodoListArray") as? [Item] {
-            itemArray = items
-        } // in order to retrieve data from userdefauls upon relaunching off app so no data is terminated.
-        
-        // Do any additional setup after loading the view, typically from a nib.
     }
     //MARK: - TableView Datasource Methods
     
@@ -64,7 +48,7 @@ override func tableView(_ tableView: UITableView, numberOfRowsInSection section:
         //print(itemArray[indexPath.row]) //this will print out the corresponding item in the index row.
         itemArray[indexPath.row].done = !itemArray[indexPath.row].done
         
-        tableView.reloadData() // forces tableview to call its data source methods again. reloads the data
+       saveItems()
         
         tableView.deselectRow(at: indexPath, animated: true) //shows you selected a row and then deselects itself.
     }
@@ -86,11 +70,8 @@ override func tableView(_ tableView: UITableView, numberOfRowsInSection section:
             
             self.itemArray.append(newItem) //you can force unwrap because the text property of a textfield will never equal nil
             
-            self.defaults.set(self.itemArray, forKey: "TodoListArray") // this saves the updated itemArray to the user defaults using the key "TodoListArray" making it a dictionary. remember this code is inside a closure hence the need for the self. at the beginning of the code.
-            
-            self.tableView.reloadData() //updates and adds new data to array.
-            
-        }//this is the button you press after you have finished creating your todo list item.
+            self.saveItems()
+        }
         
         alert.addTextField { (alertTextField) in
             alertTextField.placeholder = "Create new item"
@@ -101,7 +82,31 @@ override func tableView(_ tableView: UITableView, numberOfRowsInSection section:
         present(alert, animated: true, completion: nil)
     }
     
+    //MARK - Model Manipulation Methods
     
-    
+    func saveItems() {
+        let encoder = PropertyListEncoder()
+        
+        do {
+            let data = try encoder.encode(itemArray)
+            try data.write(to: dataFilePath!)
+            
+        } catch {
+            print("Error encoding item array, \(error)")
+            
+        }
+        self.tableView.reloadData()    }
+
+    func loadItems() {
+        if let data = try? Data(contentsOf: dataFilePath!) {
+        let decoder = PropertyListDecoder()
+        do {
+        itemArray = try decoder.decode([Item].self, from: data)
+        } catch {
+            print("Error decoding item array, \(error)")
+            
+}
+}
+}
 }
 
